@@ -1,25 +1,30 @@
 #!/system/bin/sh
+# Exit immediately if a command exits with a non-zero status
+set -e
+
 BASEDIR=$(dirname "$0")
-DEX="$BASEDIR"/rish_shizuku.dex
+DEX="$BASEDIR/rish_shizuku.dex"
 
 if [ ! -f "$DEX" ]; then
-  echo "Cannot find $DEX, please check the tutorial in Shizuku app"
+  echo "Error: Cannot find $DEX. Please check the tutorial in the Shizuku app." >&2
   exit 1
 fi
 
-if [ $(getprop ro.build.version.sdk) -ge 34 ]; then
-  if [ -w $DEX ]; then
-    echo "On Android 14+, app_process cannot load writable dex."
-    echo "Attempting to remove the write permission..."
-    chmod 400 $DEX
+# Check if running on Android 14+ (SDK >= 34)
+if [ "$(getprop ro.build.version.sdk)" -ge 34 ]; then
+  if [ -w "$DEX" ]; then
+    echo "On Android 14+, app_process cannot load a writable dex file."
+    echo "Attempting to remove the write permission from $DEX..."
+    chmod 400 "$DEX"
   fi
-  if [ -w $DEX ]; then
-    echo "Cannot remove the write permission of $DEX."
-    echo "You can copy to file to terminal app's private directory (/data/data/<package>, so that remove write permission is possible"
+  if [ -w "$DEX" ]; then
+    echo "Error: Unable to remove write permission from $DEX." >&2
+    echo "Suggestion: Copy the file to your terminal app's private directory (/data/data/<package>) where permissions can be set correctly." >&2
     exit 1
   fi
 fi
 
-# Replace "PKG" with the application id of your terminal app
+# Replace "PKG" with the actual application ID of your terminal app if not already set
 [ -z "$RISH_APPLICATION_ID" ] && export RISH_APPLICATION_ID="PKG"
+
 /system/bin/app_process -Djava.class.path="$DEX" /system/bin --nice-name=rish rikka.shizuku.shell.ShizukuShellLoader "$@"
