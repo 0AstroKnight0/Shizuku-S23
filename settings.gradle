@@ -1,3 +1,5 @@
+// settings.gradle
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -14,6 +16,7 @@ pluginManagement {
         }
     }
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -24,7 +27,8 @@ dependencyResolutionManagement {
         maven {
             url("https://s01.oss.sonatype.org/content/repositories/releases/")
             content {
-                includeGroupByRegex("dev.rikka.*")
+                // Use regex escaping for dots
+                includeGroupByRegex("dev\\.rikka.*")
                 includeGroup("org.lsposed.hiddenapibypass")
             }
         }
@@ -44,42 +48,36 @@ dependencyResolutionManagement {
     }
 }
 
-include ':server', ':starter', ':shell'
-include ':manager'
-include ':common'
+// Set the root project name
+rootProject.name = "Shizuku"
 
-def root = "api"
+// Include core modules
+include ':server', ':starter', ':shell', ':manager', ':common'
 
+// Determine the root directory for additional modules (default "api")
+def rootDirName = "api"
 def propFile = file('local.properties')
-def props = new Properties()
-
 if (propFile.canRead()) {
-    props.load(new FileInputStream(propFile))
-
-    if (props != null) {
-        if (props["api.useLocal"].equals("true")) {
-            root = props["api.dir"]
-        }
+    def props = new Properties()
+    propFile.withInputStream { stream ->
+        props.load(stream)
+    }
+    if (props.getProperty("api.useLocal")?.toBoolean()) {
+        rootDirName = props.getProperty("api.dir", "api")
     }
 }
 
-include ':aidl'
-project(':aidl').projectDir = file("$root${File.separator}aidl")
+// Helper function to include a project and set its directory dynamically
+def includeProject = { projectName, subDir ->
+    include ":${projectName}"
+    project(":${projectName}").projectDir = file("$rootDirName${File.separator}${subDir}")
+}
 
-include ':rish'
-project(':rish').projectDir = file("$root${File.separator}rish")
-
-include ':shared'
-project(':shared').projectDir = file("$root${File.separator}shared")
-
-include ':api'
-project(':api').projectDir = file("$root${File.separator}api")
-
-include ':provider'
-project(':provider').projectDir = file("$root${File.separator}provider")
-
-include ':server-shared'
-project(':server-shared').projectDir = file("$root${File.separator}server-shared")
-
-include ':hidden-api-stub'
-project(':hidden-api-stub').projectDir = file("$root${File.separator}hidden-api-stub")
+// Include additional projects with custom directories
+includeProject('aidl', 'aidl')
+includeProject('rish', 'rish')
+includeProject('shared', 'shared')
+includeProject('api', 'api')
+includeProject('provider', 'provider')
+includeProject('server-shared', 'server-shared')
+includeProject('hidden-api-stub', 'hidden-api-stub')
