@@ -1,14 +1,12 @@
 plugins {
     id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
 }
 
 android {
     namespace 'rikka.shizuku.common'
-    buildFeatures {
-        buildConfig = false
-    }
-}
+    compileSdk 34
 
-dependencies {
-    compileOnly libs.hidden.stub
-}
+    defaultConfig {
+        minSdk 23
+114
