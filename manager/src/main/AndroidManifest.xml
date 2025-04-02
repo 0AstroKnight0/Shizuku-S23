@@ -11,16 +11,16 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!-- WRITE_SECURE_SETTINGS is a protected permission; using tools:ignore for legacy reasons -->
+    <!-- WRITE_SECURE_SETTINGS is protected; legacy support uses tools:ignore -->
     <uses-permission
         android:name="android.permission.WRITE_SECURE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
-    <!-- This permission is removed as per requirements -->
+    <!-- Remove deprecated permission -->
     <uses-permission
         android:name="moe.shizuku.manager.permission.API_V23"
         tools:node="remove" />
 
-    <!-- Declare optional features for wider device compatibility -->
+    <!-- Optional features to broaden device compatibility -->
     <uses-feature
         android:name="android.software.leanback"
         android:required="false" />
@@ -62,7 +62,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning"
-        tools:targetApi="33">
+        tools:targetApi="34">
 
         <!-- Main Launcher Activity -->
         <activity
