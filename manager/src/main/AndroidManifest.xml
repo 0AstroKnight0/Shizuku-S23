@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="moe.shizuku.manager">
 
+    <!-- Required Permissions -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="moe.shizuku.manager.permission.MANAGER" />
@@ -9,13 +11,16 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- WRITE_SECURE_SETTINGS is a protected permission; using tools:ignore for legacy reasons -->
     <uses-permission
         android:name="android.permission.WRITE_SECURE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
+    <!-- This permission is removed as per requirements -->
     <uses-permission
         android:name="moe.shizuku.manager.permission.API_V23"
         tools:node="remove" />
 
+    <!-- Declare optional features for wider device compatibility -->
     <uses-feature
         android:name="android.software.leanback"
         android:required="false" />
@@ -23,12 +28,14 @@
         android:name="android.hardware.touchscreen"
         android:required="false" />
 
+    <!-- Custom Permission Group -->
     <permission-group
         android:name="moe.shizuku.manager.permission-group.API"
         android:description="@string/permission_group_description"
         android:icon="@drawable/ic_system_icon"
         android:label="@string/permission_group_label" />
 
+    <!-- Custom Permissions -->
     <permission
         android:name="moe.shizuku.manager.permission.MANAGER"
         android:protectionLevel="signature" />
@@ -57,20 +64,19 @@
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="33">
 
+        <!-- Main Launcher Activity -->
         <activity
             android:name=".MainActivity"
             android:banner="@mipmap/banner"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
-
-                <!-- 2023.08.03: Google play enforces that apps with LEANBACK_LAUNCHER Activity must be uploaded with App Bundle format, -->
-                <!-- and possibly additional review steps. To avoid problems, remove it temporarily. -->
-                <!--<category android:name="android.intent.category.LEANBACK_LAUNCHER" />-->
+                <!-- LEANBACK_LAUNCHER category removed per Google Play requirements -->
             </intent-filter>
         </activity>
+
+        <!-- Additional Activities -->
         <activity
             android:name=".management.ApplicationManagementActivity"
             android:label="@string/home_app_management_title" />
@@ -100,7 +106,6 @@
             android:theme="@style/GrantPermissions">
             <intent-filter>
                 <action android:name="${applicationId}.intent.action.REQUEST_PERMISSION" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -112,7 +117,6 @@
             android:theme="@style/GrantPermissions">
             <intent-filter>
                 <action android:name="rikka.shizuku.intent.action.REQUEST_BINDER" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -124,22 +128,22 @@
             android:theme="@style/GrantPermissions">
             <intent-filter>
                 <action android:name="${applicationId}.intent.action.REQUEST_AUTHORIZATION" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
+        <!-- Services -->
         <service
             android:name=".adb.AdbPairingService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="connectedDevice" />
-
         <service
             android:name=".starter.SelfStarterService"
             android:enabled="true"
             android:exported="false" />
 
+        <!-- Receivers -->
         <receiver
             android:name=".receiver.BootCompleteReceiver"
             android:directBootAware="true"
@@ -152,7 +156,6 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".receiver.ShizukuReceiver"
             android:directBootAware="true"
@@ -164,6 +167,7 @@
             </intent-filter>
         </receiver>
 
+        <!-- Content Provider -->
         <provider
             android:name=".ShizukuManagerProvider"
             android:authorities="${applicationId}.shizuku"
